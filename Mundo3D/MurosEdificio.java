@@ -62,7 +62,7 @@ public class MurosEdificio {
             TransformGroup muro = Figuras.colocarCaja(tgMuros, anchoLateralPFrontal / 2.0f, ALTURA_MUROS / 2.0f, GROSOR_MUROS / 2.0f,
                                           -medioAncho + (anchoLateralPFrontal / 2.0f), centroYMuro, medioProfundidad,
                                           0, 0, 0, this.texturaExteriorNombre);
-
+// 2. Ahora creamos la caja de colisión pasándole el muro que acabamos de crear.
 cajasColisionMuros.add(new CajaColision(muro)); // <-- LÍNEA CORREGIDA
         }
         float alturaDintelPFrontal = ALTURA_MUROS - ALTURA_PUERTA_FRONTAL;

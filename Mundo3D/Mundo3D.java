@@ -79,7 +79,6 @@ public class Mundo3D extends JFrame implements KeyListener, MouseMotionListener,
     lienzo.requestFocusInWindow();
     }
 
-     // --- Métodos de Mouse ---
     @Override public void mousePressed(MouseEvent e) { mouseXprevio = e.getX(); }
     @Override public void mouseReleased(MouseEvent e) { mouseXprevio = -1; }
     @Override public void mouseDragged(MouseEvent e) { procesarMovimientoMouse(e.getX()); }
@@ -91,32 +90,23 @@ public class Mundo3D extends JFrame implements KeyListener, MouseMotionListener,
     @Override
 public void keyPressed(KeyEvent e) {
      teclasPresionadas.put(e.getKeyCode(), true);
-
-    // --- LÓGICA DE INTERACCIÓN MODIFICADA ---
     if (e.getKeyCode() == KeyEvent.VK_E) {
-        // Cuando se presiona 'E', ahora activamos todas las puertas a la vez.
         activarTodasLasPuertas(); 
     }
 }
 
 private void activarTodasLasPuertas() {
-    // 1. Validar que la escena y la lista de interacciones existan.
     if (escena == null || escena.getListaInteracciones().isEmpty()) {
         return;
     }
 
-    // 2. Obtener el mapa de todos los objetos interactivos.
-    // La clave de este mapa es el objeto que implementa Interaccion (nuestras puertas).
     HashMap<Interaccion, CajaColision> interacciones = escena.getListaInteracciones();
-
-    // 3. Recorrer cada objeto interactivo y llamar a su método accion().
-    // Esto hará que cada puerta inicie su animación de abrir/cerrar.
+ 
     for (Interaccion objeto : interacciones.keySet()) {
-        objeto.accion(); // Llama al método accion() de cada puerta.
+        objeto.accion(); 
     }
 }
 
-    // --- Métodos de Teclado ---
     @Override public void keyTyped(KeyEvent e) {}
     @Override public void keyReleased(KeyEvent e) { teclasPresionadas.put(e.getKeyCode(), false); }
 
@@ -146,30 +136,23 @@ private void activarTodasLasPuertas() {
     Vector3f movLocal = new Vector3f(deltaX_local, 0, deltaZ_local);
     matrizRotacion.transform(movLocal);
     
-     // --- LÓGICA DE COLISIÓN ---
     Transform3D t3dMundoActual = new Transform3D();
     escena.getTgMundo().getTransform(t3dMundoActual);
     Vector3f posMundoActual = new Vector3f();
     t3dMundoActual.get(posMundoActual);
     
-    // Calcular la posición del mundo en el siguiente frame
     float proxMundoX = posMundoActual.x - movLocal.x;
     float proxMundoZ = posMundoActual.z - movLocal.z;
-
-    // Revisar si esa próxima posición choca con algo
+    
     if (escena.hayColision(proxMundoX, proxMundoZ)) {
-    // Si hay colisión, CANCELAMOS el movimiento y la animación
     if (escena.getMuñeco() != null && escena.getMuñeco().estaAnimado()) {
-    escena.getMuñeco().detenerCaminar();
+        escena.getMuñeco().detenerCaminar();
     }
-    return;
+     return;
     }
-    // --- FIN DE LÓGICA DE COLISIÓN ---
 
-    // Si no hay colisión, proceder a mover el mundo
     Figuras.moverTG(escena.getTgMundo(), -movLocal.x, 0, -movLocal.z);
 
-    // Lógica de animación
     if (escena.getMuñeco() != null) {
     if ((deltaX_local != 0 || deltaZ_local != 0) && !escena.getMuñeco().estaAnimado()) {
          escena.getMuñeco().caminar();
@@ -185,13 +168,11 @@ private void activarTodasLasPuertas() {
             float deltaX_local = 0;
             float deltaZ_local = 0;
 
-            // --- Procesar Teclado (Input local: adelante es +Z) ---
             if (teclasPresionadas.getOrDefault(KeyEvent.VK_W, false)) deltaZ_local -= velocidadMovimiento;
             if (teclasPresionadas.getOrDefault(KeyEvent.VK_S, false)) deltaZ_local += velocidadMovimiento;
             if (teclasPresionadas.getOrDefault(KeyEvent.VK_A, false)) deltaX_local -= velocidadMovimiento;
             if (teclasPresionadas.getOrDefault(KeyEvent.VK_D, false)) deltaX_local += velocidadMovimiento;
 
-            // --- Procesar Joystick ---
             float joyXNorm = (joystickX - JOYSTICK_CENTRO) / JOYSTICK_RANGO;
             float joyYNorm = (JOYSTICK_CENTRO - joystickY) / JOYSTICK_RANGO;
 
@@ -200,18 +181,15 @@ private void activarTodasLasPuertas() {
             
             if (joyXNorm != 0 || joyYNorm != 0) {
             deltaX_local += joyXNorm * velocidadMovimiento;
-                deltaZ_local += joyYNorm * -velocidadMovimiento; // Invertir Y para que arriba sea -Z
+                deltaZ_local += joyYNorm * -velocidadMovimiento; 
             }
 
-            // Normalizar para evitar movimiento diagonal más rápido
             if (deltaX_local != 0 && deltaZ_local != 0) {
                 deltaX_local *= 0.7071f;
                 deltaZ_local *= 0.7071f;
             }
 
-            // Aplicar movimiento si hay input
             if (deltaX_local != 0 || deltaZ_local != 0) {
-            // La colisión se debería verificar aquí antes de mover
             moverMundoYAnimar(deltaX_local, deltaZ_local);
             } else {
                 if (escena.getMuñeco() != null && escena.getMuñeco().estaAnimado()) {
@@ -219,8 +197,6 @@ private void activarTodasLasPuertas() {
                 }
             }
 
-            // La cámara ya no se actualiza explícitamente aquí, su ancla se rota por el mouse
-            // y el personaje (que es hijo del ancla) se queda en su centro.
 
         try {
                 Thread.sleep(16);
@@ -230,9 +206,8 @@ private void activarTodasLasPuertas() {
         }
     }
 
-    // --- Métodos de Joystick ---
     private void inicializarJoystick() {
-    String nombrePuerto = "COM3"; // ¡ASEGÚRATE DE QUE ESTE SEA TU PUERTO CORRECTO!
+    String nombrePuerto = "COM3"; 
         System.out.println("Intentando conectar al joystick en el puerto: " + nombrePuerto);
         serialPort = SerialPort.getCommPort(nombrePuerto);
         serialPort.setBaudRate(9600);
